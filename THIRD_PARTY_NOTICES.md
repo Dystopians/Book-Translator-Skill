@@ -5,6 +5,14 @@ This repository contains modified code derived from
 under the MIT License. The original copyright notice is retained in
 [`LICENSE`](LICENSE).
 
+The translation-naturalness guidance was independently adapted for faithful
+book translation from ideas in the
+[`anti-ai-writing` skill](https://github.com/cdeistopened/skill-stack/blob/main/.claude/skills/anti-ai-writing/SKILL.md)
+from `cdeistopened/skill-stack` (Copyright (c) 2025 Wayne Sutton), which is
+distributed under the MIT License. The upstream skill is not bundled verbatim;
+this repository adds source-fidelity, target-language, and domain-profile
+safeguards for translation.
+
 The EPUB files under `tests/baselines/` are third-party test fixtures and are
 not covered by the repository's MIT License:
 

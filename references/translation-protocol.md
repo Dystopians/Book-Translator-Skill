@@ -120,6 +120,12 @@ contains `type`, `severity`, `source_quote`, `target_quote`, and optional
 `message`. Types are omission, addition, terminology, entity, claim, polarity,
 modality, attribution, number, citation, format, or style. Severities are
 critical, high, medium, or low. Quotes must match their source/output files.
+Use `style` only for a contextual target-language or profile defect. A phrase
+list, detector label, construction frequency, or the faithful preservation of
+a source-marked device is not a defect by itself. If a passage has both a style
+problem and semantic drift, report both findings under their respective types;
+never hide polarity, modality, attribution, claim, or terminology damage under
+`style`.
 Changing the translation after review invalidates the sidecar even when the
 knowledge dependency is unchanged. Review v1 is accepted only by legacy
 compatibility stores; an authoritative enhanced store requires v2.
@@ -185,9 +191,15 @@ independent semantic reviewer.
 - Analyzer: read one source chunk plus its analyze packet; write exactly one
   analysis sidecar; do not translate.
 - Translator: read one source chunk and one translate packet; write exactly one
-  translated chunk and one v2 meta sidecar; output no commentary.
+  translated chunk and one v2 meta sidecar; output no commentary. Produce a
+  faithful draft first, then run the bounded naturalness and semantic-anchor
+  recheck defined by the profile rules.
 - Reviewer: independently read one source chunk, its translation, and one
   review packet; write exactly one review sidecar; do not rewrite the output.
+  Compare semantics before style, then perform a separate target-language and
+  profile-aware naturalness review without blacklists or detector guesses. If
+  direct user custom instructions exist, receive the same instructions through
+  a separate trusted field and verify them without mixing them into book data.
 - Workers have no shell, network, secret, or unrelated-file access. The
   orchestrator alone runs checked-in scripts with structured arguments.
 

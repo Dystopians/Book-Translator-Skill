@@ -1,6 +1,6 @@
 ---
 name: translate-book
-description: Translate complete PDF, DOCX, EPUB, or Markdown books into another language with evidence-backed terminology, long-range claim and entity memory, deferred ambiguity resolution, bounded parallel workers, independent review, selective retranslation, and gated HTML/DOCX/EPUB/PDF publishing. Use when Codex must translate or resume translating a long document while preserving formatting, professional terminology, argument semantics, narrative voice, and cross-chapter consistency.
+description: Translate complete PDF, DOCX, EPUB, or Markdown books into another language with evidence-backed terminology, long-range claim and entity memory, deferred ambiguity resolution, bounded parallel workers, independent review, selective retranslation, and gated HTML/DOCX/EPUB/PDF publishing. Use when Codex must translate or resume translating a long document while preserving formatting, professional terminology, argument semantics, natural target-language prose, narrative voice, and cross-chapter consistency.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, AskUserQuestion
 metadata: {"openclaw":{"requires":{"bins":["python3","pandoc","ebook-convert"],"anyBins":["calibre","ebook-convert"]},"homepage":"https://github.com/Dystopians/Book-Translator-Skill"}}
 ---
@@ -174,6 +174,12 @@ profile-specific voice. It must use sense-specific canonical terms. When
 evidence is insufficient, write a readable provisional translation and an
 unresolved record; never insert internal markers or silently guess.
 
+After the faithful draft, require the bounded naturalness pass in the profile
+rules, followed by a source comparison of every semantic anchor. Apply
+language- and profile-specific judgment, not an AI-detector label, phrase
+blacklist, or frequency quota. Naturalness never permits semantic drift, a
+change to source/profile voice, or a paragraph-boundary or formatting change.
+
 After each batch, first ingest the exact v2 sidecars against the memory hash
 used by that batch, then record their output hashes:
 
@@ -193,11 +199,18 @@ For each complete output lacking a review for its current dependency hash:
 
 1. Generate a review packet with `context_packet.py --phase review`.
 2. Launch a fresh reviewer that did not translate the chunk. Give it only the
-   source, translation, packet, and profile rules.
+   source, translation, packet, profile rules, and the same direct user custom
+   instructions supplied in a separate trusted instruction field.
 3. Require exactly `review_chunkNNNN.json` schema v2 with the packet's current
    `dependency_hash` and `review_target.output_hash`. The reviewer must report
    structured findings, not rewrite the translation. Any later output edit
    invalidates this review and requires a fresh independent review.
+
+Review fidelity before naturalness. Report source-unmotivated calques,
+boilerplate, connective clutter, or mechanical uniformity as contextual
+`style` findings. Report any affected claim, polarity, modality, attribution,
+scope, or other semantic invariant separately under its semantic finding type;
+a style label must never conceal semantic drift.
 
 Ingest and evaluate all reviews:
 

@@ -2,7 +2,7 @@
 
 [![中文 README](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-d73a49?style=for-the-badge)](README.md)
 
-An evidence-backed translation skill for long PDF, DOCX, EPUB, and Markdown documents. It organizes full-book analysis, professional terminology, entities and facts, distant claims, difficult-sentence backwriting, independent review, and multi-format publishing into a resumable closed loop.
+An evidence-backed translation skill for long PDF, DOCX, EPUB, and Markdown documents. It organizes full-book analysis, professional terminology, entities and facts, distant claims, difficult-sentence backwriting, fidelity-constrained natural prose, independent review, and multi-format publishing into a resumable closed loop.
 
 ## Usage
 
@@ -234,6 +234,14 @@ Retrieval is offline and combines exact forms, aliases, keywords, BM25, and CJK 
 - Knowledge versions advance monotonically. Automatic semantic backwriting is limited to three rounds, with one retry for a failed worker per round.
 - If a decision oscillates, automatic resolution stops and the issue is sent to the user instead of retrying forever.
 - Convergence requires no new knowledge changes, dirty chunks, stale dependencies, or blocking unresolved items.
+
+### Natural Prose under Fidelity Constraints
+
+- The translator produces a faithful draft first, then reads the complete chunk as target-language prose to find source-syntax calques, abnormal collocations or order, translation-added boilerplate and connective clutter, and mechanical uniformity absent from the source.
+- The fixed priority is semantic fidelity and confirmed knowledge > source voice and domain profile > naturalness. Naturalization may not change a claim holder, polarity, modality, scope, attribution, agency, logic, terminology, number, ambiguity, paragraph, or format.
+- AI-detector labels, phrase blacklists, and frequency quotas are not used as quality evidence. English filler, dash, or passive-voice rules are never projected onto Chinese, the default target language, or another language by analogy.
+- The system does not remove source hedging, passive focus, repetition, fragments, rhetorical questions, complex reasoning, or literary strangeness merely to sound human. It never invents numbers, examples, experience, hooks, or unstated agents.
+- Independent review records a pure naturalness defect as a contextual `style` finding. If the same passage changes polarity, modality, a claim, or attribution, the reviewer must also report the corresponding semantic finding. Severe defects trigger whole-chunk retranslation and a fresh review.
 
 ### Independent Review and Publishing Gate
 
