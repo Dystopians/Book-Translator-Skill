@@ -1,5 +1,7 @@
 # Book Translator Skill
 
+[![English README](https://img.shields.io/badge/README-English-0969da?style=for-the-badge)](README.en.md)
+
 面向 PDF、DOCX、EPUB 与 Markdown 长文的证据增强翻译 Skill。它把全书分析、专业术语、人物与事实、远距离主张、困难句回写、独立审译和多格式发布组织成一条可恢复的闭环流水线。
 
 ## 使用方式
@@ -30,6 +32,9 @@ git clone https://github.com/Dystopians/Book-Translator-Skill.git ~/.codex/skill
 
 ### 直接交给 Agent
 
+> [!IMPORTANT]
+> 默认翻译目标语言是中文，即 `target_lang=zh`。仅仅使用英文向 Agent 下达指令，并不会把目标语言自动改成英文；需要英文译文时，必须显式写出“翻译为英文”或 `target_lang=en`。
+
 最简单的调用方式：
 
 ```text
@@ -42,12 +47,34 @@ git clone https://github.com/Dystopians/Book-Translator-Skill.git ~/.codex/skill
 使用 $translate-book 将 /path/to/book.pdf 翻译为英文；采用 academic-technical 档案，并发数为 8，导出文件名为 research-book。保留公式、脚注和引文格式。
 ```
 
+需要英文译文时，请明确完成以下操作：
+
+1. 使用 Agent 时，在请求中明确写出目标语言：
+
+   ```text
+   使用 $translate-book 翻译 /path/to/book.epub，目标语言设为英文（target_lang=en）。
+   ```
+
+2. 手动调用转换脚本时，把默认的 `--olang zh` 改为 `--olang en`：
+
+   ```bash
+   python scripts/convert.py /path/to/book.epub --olang en
+   ```
+
+3. 如果同一本书已经存在中文工作目录，不要直接复用它。为英文任务指定新的 `temp_root`，并在后续命令中使用新生成的工作目录：
+
+   ```bash
+   python scripts/convert.py /path/to/book.epub --olang en --temp-root ./translation-en
+   ```
+
+   该命令会在 `./translation-en/` 下创建新的 `{书名}_temp/`。后续命令中的 `book_temp` 必须替换为这个新工作目录的实际路径。
+
 可用参数如下：
 
 | 参数 | 含义 | 默认值或范围 |
 |---|---|---|
 | `file_path` | PDF、DOCX、EPUB、`.md` 或 `.markdown` 输入 | 必填 |
-| `target_lang` | 目标语言代码或明确语言名 | `zh` |
+| `target_lang` | 目标语言代码或明确语言名；英文必须显式指定 `en` | `zh` |
 | `concurrency` | 同时工作的子 Agent 数 | 默认 `8`，范围 `1–16` |
 | `profile` | 翻译领域档案 | `auto`、`general`、`academic-technical`、`legal`、`literary` |
 | `temp_root` | 可恢复工作目录的父目录 | 当前工作目录 |
@@ -67,7 +94,7 @@ git clone https://github.com/Dystopians/Book-Translator-Skill.git ~/.codex/skill
    python scripts/convert.py /path/to/book.epub --olang zh
    ```
 
-   如需指定位置或分块大小，可增加 `--temp-root /path/to/work` 或 `--chunk-size 6000`。输出工作目录默认为 `{书名}_temp/`。
+   如需英文，把命令改为 `--olang en`。如需指定位置或分块大小，可增加 `--temp-root /path/to/work` 或 `--chunk-size 6000`。输出工作目录默认为 `{书名}_temp/`。
 
 2. 初始化事务式知识库，并为每个 `chunkNNNN.md` 生成分析上下文：
 
@@ -158,7 +185,7 @@ python scripts/merge_and_build.py --temp-dir book_temp --quality-mode final --cl
 - 翻译前分析每一个 chunk，而不是只抽样开头、中间或结尾。
 - 术语按“词形 + 语义”建模，同一词形可以对应多个专业含义；每个语义可保存别名、标准译法、禁用译法、领域和用法说明。
 - 实体层记录人物、组织、地点、属性、关系和事件；事实带肯否、模态、范围、来源位置与原文引证。
-- 关键主张单独记录持有者、命题、肯否、模态强度、适用范围和目标语约束。系统要求语义一致，但不会强迫所有位置机械复用同一句中文。
+- 关键主张单独记录持有者、命题、肯否、模态强度、适用范围和目标语约束。系统要求语义一致，但不会强迫所有位置机械复用同一句目标语译文。
 - 文体规则可分别作用于全书、章节、叙述者和人物，以维持语域、节奏、称谓与声音的一致性。
 - 所有权威 ID 由脚本根据规范内容和来源位置生成。证据必须包含可在对应源片段中精确匹配的引文，Agent 不能自行伪造 ID。
 
