@@ -1,0 +1,4 @@
+interface:
+  display_name: "Translate Book"
+  short_description: "Evidence-backed long-form book translation"
+  default_prompt: "Use $translate-book to translate this book with evidence-backed terminology, long-range consistency, and independent review."
