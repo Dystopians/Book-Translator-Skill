@@ -1,14 +1,11 @@
 import contextlib
 import io
 import json
-import os
 import sqlite3
-import stat
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest import mock
 
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / "scripts"
@@ -297,13 +294,20 @@ class QualityGateTests(unittest.TestCase):
     def test_rejects_symlink_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self._workspace(tmp)
-            self._review(root)
+            review_path = self._review(root)
+            review_target = root / "review_payload.json"
+            review_path.replace(review_target)
 
-            # Windows CI often cannot create a real symlink without an extra
-            # privilege. Model the mode classification directly so the
-            # rejection branch remains covered on every platform.
-            with mock.patch.object(quality_gate.stat, "S_ISLNK", return_value=True):
-                report = quality_gate.evaluate_gate(root, "final")
+            # Exercise the actual file-system boundary on platforms that can
+            # create symlinks.  Patching stat.S_ISLNK globally is unsafe on
+            # POSIX because pathlib.resolve() uses the same function while
+            # canonicalizing the workspace itself.
+            try:
+                review_path.symlink_to(review_target.name)
+            except (NotImplementedError, OSError) as exc:
+                self.skipTest(f"symbolic links are unavailable: {exc}")
+
+            report = quality_gate.evaluate_gate(root, "final")
 
             self.assertIn("review_invalid", self._codes(report))
             invalid = next(
